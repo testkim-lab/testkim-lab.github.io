@@ -1,0 +1,12 @@
+golden.jpg | https://commons.wikimedia.org/wiki/File:Bubbles_the_Golden_Retriever.png | CC-BY
+jindo.jpg | https://commons.wikimedia.org/wiki/File:Jindo_wiki.jpg | CC0
+poodle.jpg | https://commons.wikimedia.org/wiki/File:Toy_Poodle_wearing_clothes_in_Tokyo.jpg | CC0
+shihtzu.jpg | https://commons.wikimedia.org/wiki/File:Shih_Tzu_-_Star_of_Buddha.jpg | CC-BY-SA
+chihuahua.jpg | https://commons.wikimedia.org/wiki/File:Chihuahua_wikipedia.jpg | CC0
+border.jpg | https://commons.wikimedia.org/wiki/File:Blue_merle_border_collie.jpg | CC0
+bichon.jpg | https://commons.wikimedia.org/wiki/File:Bichon_Frise_600.jpg | CC0
+corgi.jpg | https://commons.wikimedia.org/wiki/File:Fawn_and_white_Welsh_Corgi_puppy_standing_on_rear_legs_and_sticking_out_the_tongue.jpg | CC0
+maltese.jpg | https://commons.wikimedia.org/wiki/File:Oyku-Maltese.jpg | CC0
+pomeranian.jpg | https://commons.wikimedia.org/wiki/File:Pomeranian_orange_sable_600.jpg | CC0
+dachshund.jpg | https://commons.wikimedia.org/wiki/File:Teckel_-_39.jpg | CC0
+samoyed.jpg | https://commons.wikimedia.org/wiki/File:Samoyed_dog_two_year_old_female_dllu.jpg | CC0
