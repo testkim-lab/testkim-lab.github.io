@@ -370,6 +370,11 @@ function showQuestion() {
     btn.onclick = () => pick(pts);
     box.appendChild(btn);
   });
+
+  // 클릭한 버튼이 사라지고 같은 자리에 다음 문항 버튼이 나타나면, 마우스가 그대로
+  // 있으니 브라우저가 그 버튼을 "호버 중"으로 착각해 색이 미리 입혀지는 문제 방지
+  box.style.pointerEvents = "none";
+  requestAnimationFrame(() => requestAnimationFrame(() => { box.style.pointerEvents = ""; }));
 }
 
 function pick(pts) {
