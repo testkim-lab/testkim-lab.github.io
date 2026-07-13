@@ -176,11 +176,11 @@
     <div class="trait-box"><h3>💡 이 강아지와 잘 맞는 이유</h3><p id="r-why"></p></div>
     <div class="trait-box"><h3>🏠 키울 때 알아두세요</h3><p id="r-tip"></p></div>
 
-    <!-- 쿠팡 파트너스 제휴 링크 자리: 결과별 추천 상품 -->
-    <div class="shop-box">
-      <h3>🛒 <span id="r-breed-shop"></span> 맞춤 준비물</h3>
-      <a id="r-shop-link" href="#" target="_blank" rel="noopener sponsored">쿠팡에서 추천 용품 보기 →</a>
-      <p style="font-size:11px; color:var(--ink-soft); margin:8px 0 0;">
+    <!-- 쿠팡 파트너스 배너 (iframe이라 페이지 스크립트와 충돌 없음) -->
+    <div class="shop-box" style="text-align:center;">
+      <h3 style="text-align:left;">🛒 <span id="r-breed-shop"></span> 맞춤 준비물</h3>
+      <iframe src="https://ads-partners.coupang.com/widgets.html?id=1006144&template=banner&trackingCode=AF2771551&subId=&width=320&height=50" width="320" height="50" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics style="max-width:100%; display:block; margin:0 auto;"></iframe>
+      <p style="font-size:11px; color:var(--ink-soft); margin:8px 0 0; text-align:left;">
 이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
       </p>
     </div>
@@ -396,7 +396,6 @@ function showResult() {
   document.getElementById("r-why").textContent = r.why;
   document.getElementById("r-tip").textContent = r.tip;
   document.getElementById("r-breed-shop").textContent = r.name;
-  document.getElementById("r-shop-link").href = r.shopLink;
   document.getElementById("r-emoji-char").textContent = r.emoji;
   // 사진이 있으면 사진 표시, 없으면 이모지 폴백 (로딩 중엔 "불러오는 중" 안내 표시)
   const img = document.getElementById("r-photo");
