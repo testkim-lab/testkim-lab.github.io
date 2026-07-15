@@ -183,6 +183,7 @@
 
   <!-- 결과 화면 -->
   <div id="screen-result" class="card hidden">
+    <img class="level-image" id="r-image" src="" alt="결과 이미지">
     <div class="grade-visual" id="r-visual"><span id="r-emoji"></span></div>
     <p class="result-type" id="r-grade"></p>
     <p class="result-name" id="r-title"></p>
@@ -240,7 +241,7 @@ const LEVELS = {
   1: { label: "Lv.1 요즘애들", theme: "기초 신조어", color: "#7CFC00", image: "images/level1-insa.jpg" },
   2: { label: "Lv.2 영크크", theme: "직장인 신조어", color: "#FFD700", image: "images/level2-cafe.jpg" },
   3: { label: "Lv.3 늙크크", theme: "위험 신조어", color: "#FF8C00", image: "images/level3-elder.jpg" },
-  4: { label: "Lv.4 딸피단계", theme: "최종보스 신조어", color: "#FF1744", image: "images/level4-dog.jpg", blink: true }
+  4: { label: "Lv.4 딸피단계", theme: "최종보스 신조어", color: "#FF1744", image: "images/level4-elder2.jpg", blink: true }
 };
 
 // ── 10문항 (레벨 1:2문항, 2:3문항, 3:3문항, 4:2문항) ──────────────────────────
@@ -379,13 +380,13 @@ function nextQuestion() {
 // 점수가 높을수록 '요즘애들'(젊음), 낮을수록 '딸피단계'(늙음)로 판정 —
 // 문항 난이도 레벨(Lv1=쉬움~Lv4=어려움)과는 별개로 결과 등급은 점수 기준 내림차순
 function getGrade(s) {
-  if (s <= 20) return { grade:"Lv.4 딸피단계", emoji:"💀", color:"#FF1744",
+  if (s <= 20) return { grade:"Lv.4 딸피단계", emoji:"💀", color:"#FF1744", levelNum:4,
     desc:"이건 좀... 신조어는커녕 최신 유행이 뭔지도 가물가물하시죠? 완전히 딸피 상태 확정, 화석 인증 도장 쾅!" };
-  if (s <= 50) return { grade:"Lv.3 늙크크", emoji:"😵", color:"#FF8C00",
+  if (s <= 50) return { grade:"Lv.3 늙크크", emoji:"😵", color:"#FF8C00", levelNum:3,
     desc:"몇 개는 건지셨네요! 그래도 '늙크크'는 피할 수 없는 운명... 조카한테 좀 더 배우셔야겠어요." };
-  if (s <= 80) return { grade:"Lv.2 영크크", emoji:"😎", color:"#FFD700",
+  if (s <= 80) return { grade:"Lv.2 영크크", emoji:"😎", color:"#FFD700", levelNum:2,
     desc:"오, 나름 감 있으신데요? '영크크' 인증! 트렌드 살짝 놓쳤지만 아직 반박 가능한 수준입니다." };
-  return { grade:"Lv.1 요즘애들", emoji:"🔥", color:"#7CFC00",
+  return { grade:"Lv.1 요즘애들", emoji:"🔥", color:"#7CFC00", levelNum:1,
     desc:"당신은 그냥 신조어 네이티브! 완전체 '요즘애들' 인증, 조카들도 놀랄 신조어 마스터입니다." };
 }
 
@@ -393,6 +394,7 @@ function showResult() {
   document.getElementById("screen-quiz").classList.add("hidden");
   document.getElementById("screen-result").classList.remove("hidden");
   const g = getGrade(score);
+  document.getElementById("r-image").src = LEVELS[g.levelNum].image;
   document.getElementById("r-emoji").textContent = g.emoji;
   document.getElementById("r-visual").style.borderColor = g.color;
   document.getElementById("r-visual").style.boxShadow = `0 0 24px ${g.color}55`;
