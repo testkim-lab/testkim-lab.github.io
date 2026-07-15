@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dog-test",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8777", "--directory", "C:\\Users\\01144\\Desktop\\홍보\\2019 김대윤\\김대윤 2019업무폴더\\김대윤 작업\\홈페이지\\dog-test"],
+      "port": 8777
+    }
+  ]
+}
