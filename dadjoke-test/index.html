@@ -94,6 +94,7 @@
   .result-percentile { font-size: 15px; font-weight: 800; color: var(--accent-deep); margin: 0 0 4px; text-align: center; }
   .result-combo { font-size: 13px; color: #ff6f00; font-weight: 700; margin: 0 0 16px; text-align: center; }
   .result-desc { font-size: 15px; margin: 0 0 16px; text-align: center; }
+  .ad-box { text-align: center; margin: 0 0 16px; }
   .share-row { display: flex; gap: 8px; margin-top: 14px; }
   .share-row .btn { margin-top: 0; font-size: 15px; padding: 12px; }
   .ad-slot { display: none; }
@@ -183,6 +184,14 @@
     <p class="result-percentile" id="r-percentile"></p>
     <p class="result-combo" id="r-combo"></p>
     <p class="result-desc" id="r-desc"></p>
+
+    <!-- 쿠팡 파트너스 배너 (iframe이라 페이지 스크립트와 충돌 없음) -->
+    <div class="ad-box">
+      <iframe src="https://coupa.ng/cn5tXg" width="120" height="240" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics style="max-width:100%; display:block; margin:0 auto;"></iframe>
+      <p style="font-size:11px; color:var(--ink-soft); margin:8px 0 0;">
+이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+      </p>
+    </div>
 
     <div class="share-row">
       <button class="btn" onclick="openShareModal()">결과 공유하기</button>
