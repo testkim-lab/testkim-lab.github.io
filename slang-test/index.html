@@ -475,11 +475,41 @@ function drawLines(ctx, lines, x, y, lineHeight) {
   return y + lines.length * lineHeight;
 }
 
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+// 사진을 지정된 박스 안에 꽉 채워 그리되 비율은 유지 (object-fit: cover와 동일한 계산)
+function drawImageCover(ctx, img, x, y, w, h) {
+  const imgRatio = img.width / img.height;
+  const boxRatio = w / h;
+  let sx, sy, sw, sh;
+  if (imgRatio > boxRatio) {
+    sh = img.height;
+    sw = sh * boxRatio;
+    sx = (img.width - sw) / 2;
+    sy = 0;
+  } else {
+    sw = img.width;
+    sh = sw / boxRatio;
+    sx = 0;
+    sy = (img.height - sh) / 2;
+  }
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+}
+
 // ── 결과 카드를 Canvas에 직접 그려서 공유용 이미지 생성 (외부 라이브러리 불필요) ──
-function drawShareCanvas(g) {
+async function drawShareCanvas(g) {
   const canvas = document.getElementById("share-canvas");
   const ctx = canvas.getContext("2d");
-  const W = 1080, H = 1350;
+  const W = 1080;
+  const OFFSET = 440; // 사진 배너(400) + 여백(40)만큼 아래 요소들을 통째로 밀어냄
+  const H = 1350 + OFFSET;
   canvas.width = W; canvas.height = H;
   const cx = W / 2;
 
@@ -491,9 +521,25 @@ function drawShareCanvas(g) {
   ctx.font = "bold 30px 'Malgun Gothic', sans-serif";
   ctx.fillText("늙었냐크크? 신조어 감성 테스트 🧟", cx, 110);
 
+  // 레벨/등급 사진 배너
+  try {
+    const img = await loadImage(LEVELS[g.levelNum].image);
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(140, 150, 800, 400, 20);
+    ctx.clip();
+    drawImageCover(ctx, img, 140, 150, 800, 400);
+    ctx.restore();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = g.color;
+    ctx.beginPath();
+    ctx.roundRect(140, 150, 800, 400, 20);
+    ctx.stroke();
+  } catch (e) { /* 사진 로드 실패해도 카드 생성은 계속 진행 */ }
+
   ctx.save();
   ctx.beginPath();
-  ctx.arc(cx, 340, 170, 0, Math.PI * 2);
+  ctx.arc(cx, 340 + OFFSET, 170, 0, Math.PI * 2);
   ctx.closePath();
   ctx.fillStyle = "#16161f";
   ctx.fill();
@@ -503,24 +549,24 @@ function drawShareCanvas(g) {
   ctx.restore();
   ctx.font = "160px sans-serif";
   ctx.textBaseline = "middle";
-  ctx.fillText(g.emoji, cx, 350);
+  ctx.fillText(g.emoji, cx, 350 + OFFSET);
   ctx.textBaseline = "alphabetic";
 
   ctx.fillStyle = g.color;
   ctx.font = "bold 40px 'Malgun Gothic', sans-serif";
-  ctx.fillText(g.grade, cx, 570);
+  ctx.fillText(g.grade, cx, 570 + OFFSET);
 
   ctx.fillStyle = "#39ff14";
   ctx.font = "bold 46px 'Malgun Gothic', sans-serif";
-  ctx.fillText(`${score}점 / 100점`, cx, 650);
+  ctx.fillText(`${score}점 / 100점`, cx, 650 + OFFSET);
   ctx.fillStyle = "#93939f";
   ctx.font = "28px 'Malgun Gothic', sans-serif";
-  ctx.fillText(`${score / 10}문제 정답 / ${QUESTIONS.length}문제`, cx, 696);
+  ctx.fillText(`${score / 10}문제 정답 / ${QUESTIONS.length}문제`, cx, 696 + OFFSET);
 
   ctx.fillStyle = "#eaeaf2";
   ctx.font = "26px 'Malgun Gothic', sans-serif";
   const descLines = wrapLines(ctx, g.desc, W - 180);
-  drawLines(ctx, descLines, cx, 780, 40);
+  drawLines(ctx, descLines, cx, 780 + OFFSET, 40);
 
   ctx.fillStyle = "#39ff14";
   ctx.fillRect(0, H - 140, W, 140);
@@ -552,11 +598,11 @@ function isTouchDevice() {
   return navigator.maxTouchPoints > 0 || "ontouchstart" in window;
 }
 
-function handleSaveImage() {
+async function handleSaveImage() {
   const g = getGrade(score);
   let dataUrl;
   try {
-    dataUrl = drawShareCanvas(g).toDataURL("image/png");
+    dataUrl = (await drawShareCanvas(g)).toDataURL("image/png");
   } catch (e) {
     showToast("이미지 생성에 실패했습니다.");
     return;
@@ -582,7 +628,7 @@ function handleSaveImage() {
   }
 }
 
-function handleShare() {
+async function handleShare() {
   const g = getGrade(score);
   const fullText = getShareText() + "\n" + getShareUrl();
 
@@ -593,7 +639,7 @@ function handleShare() {
 
   let fileShareData = null;
   try {
-    const dataUrl = drawShareCanvas(g).toDataURL("image/png");
+    const dataUrl = (await drawShareCanvas(g)).toDataURL("image/png");
     const blob = dataURLtoBlob(dataUrl);
     const file = new File([blob], "내-신조어감성-테스트.png", { type: "image/png" });
     fileShareData = { files: [file], title: "늙었냐크크? 신조어 감성 테스트", text: fullText };
