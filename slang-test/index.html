@@ -380,10 +380,10 @@ function nextQuestion() {
 // 점수가 높을수록 '요즘애들'(젊음), 낮을수록 '딸피단계'(늙음)로 판정 —
 // 문항 난이도 레벨(Lv1=쉬움~Lv4=어려움)과는 별개로 결과 등급은 점수 기준 내림차순
 function getGrade(s) {
-  if (s <= 20) return { grade:"Lv.4 딸피단계", emoji:"💀", color:"#FF1744", levelNum:4,
-    desc:"이건 좀... 신조어는커녕 최신 유행이 뭔지도 가물가물하시죠? 완전히 딸피 상태 확정, 화석 인증 도장 쾅!" };
+  if (s <= 40) return { grade:"Lv.4 딸피단계", emoji:"💀", color:"#FF1744", levelNum:4,
+    desc:"이건 좀... 절반도 못 맞히셨네요. 신조어는커녕 최신 유행이 뭔지도 가물가물하시죠? 완전히 딸피 상태 확정, 화석 인증 도장 쾅!" };
   if (s <= 50) return { grade:"Lv.3 늙크크", emoji:"😵", color:"#FF8C00", levelNum:3,
-    desc:"몇 개는 건지셨네요! 그래도 '늙크크'는 피할 수 없는 운명... 조카한테 좀 더 배우셔야겠어요." };
+    desc:"딱 절반! 그래도 '늙크크'는 피할 수 없는 운명... 조카한테 좀 더 배우셔야겠어요." };
   if (s <= 80) return { grade:"Lv.2 영크크", emoji:"😎", color:"#FFD700", levelNum:2,
     desc:"오, 나름 감 있으신데요? '영크크' 인증! 트렌드 살짝 놓쳤지만 아직 반박 가능한 수준입니다." };
   return { grade:"Lv.1 요즘애들", emoji:"🔥", color:"#7CFC00", levelNum:1,
