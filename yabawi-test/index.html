@@ -309,7 +309,7 @@
     max-width:308px;
     min-height:64px;
     margin:18px auto 0;
-    border:1px dashed #5c4f7a;
+    border:1px solid #5c4f7a;
     border-radius:8px;
     display:flex;
     flex-direction:column;
@@ -587,9 +587,10 @@ function App() {
             <div className="ahjussi">🧔🏻</div>
             <div className="speech-bubble" key={message}>{message}</div>
           </div>
-          {/* 쿠팡 파트너스 배너 자리 — 실제 위젯 iframe/링크 정해지면 여기 내용물만 교체 */}
+          {/* 쿠팡 파트너스 위젯(레트로 게임기) — iframe 속성이 JSX에서 깨지지 않게 문자열 그대로 삽입 */}
           <div className="coupang-slot">
-            <span>🛒 쿠팡 파트너스 배너 자리 (연동 예정)</span>
+            <span>🕹️ 아저씨 추천템 · 레트로 게임기</span>
+            <div dangerouslySetInnerHTML={{ __html: '<iframe src="https://coupa.ng/coaWpZ" width="120" height="240" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics></iframe>' }} />
             <span className="coupang-disclaimer">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span>
           </div>
         </div>
