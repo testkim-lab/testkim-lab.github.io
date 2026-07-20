@@ -435,7 +435,7 @@ const sfx = {
 function App() {
   const [level, setLevel] = useState(1);
   const [hearts, setHearts] = useState(3);
-  const [phase, setPhase] = useState("idle"); // idle | reveal | hide | shuffle | guess | result | gameover | win
+  const [phase, setPhase] = useState("idle"); // idle | showcase | reveal | hide | shuffle | guess | result | gameover | win
   const [cards, setCards] = useState(makeRound(cardCountForLevel(1)));
   const [message, setMessage] = useState(pick(LINES.intro));
   const [pickedId, setPickedId] = useState(null);
@@ -477,10 +477,15 @@ function App() {
     const round = makeRound(cardCountForLevel(targetLevel));
     setPickedId(null);
     setCards(round);
-    setPhase("reveal");
+    // 당첨 클로버를 가운데에 크게 보여준 다음, 제자리로 들어가는 것까지 보여주고 나서 뒤집는다
+    setPhase("showcase");
     setMessage(pick(LINES.reveal));
 
-    await delay(1300);
+    await delay(1200);
+    if (roundToken.current !== myToken) return;
+
+    setPhase("reveal");
+    await delay(1150);
     if (roundToken.current !== myToken) return;
 
     setPhase("hide");
@@ -560,7 +565,7 @@ function App() {
     }
   };
 
-  const showFaces = phase === "reveal" || phase === "result";
+  const showFaces = phase === "showcase" || phase === "reveal" || phase === "result";
   const locked = phase !== "guess";
 
   return (
@@ -613,11 +618,20 @@ function App() {
               if (pickedId === c.id && phase === "result") {
                 frontClass += c.isWinner ? " picked-correct" : " picked-wrong";
               }
+              // showcase 동안 당첨 카드는 보드 가운데에 크게 떠 있다가, reveal로 넘어가면 제자리로 슬라이드
+              const showcasing = phase === "showcase" && c.isWinner;
+              const introMove = phase === "showcase" || phase === "reveal";
               return (
                 <div
                   key={c.id}
                   className={"card" + (locked ? " locked" : "")}
-                  style={{ transform: `translateX(${slotX[c.slot]}px)`, transitionDuration: `${cardTransitionMs}ms` }}
+                  style={{
+                    transform: showcasing
+                      ? `translateX(${(BOARD_W - CARD_W) / 2}px) translateY(6px) scale(1.6)`
+                      : `translateX(${slotX[c.slot]}px)`,
+                    transitionDuration: introMove ? "600ms" : `${cardTransitionMs}ms`,
+                    zIndex: c.isWinner && introMove ? 5 : undefined,
+                  }}
                   onClick={() => handlePick(c.id)}
                 >
                   <div className={"card-inner" + (showFaces ? " face-up" : "")}>
