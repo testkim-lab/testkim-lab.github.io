@@ -443,8 +443,12 @@ function App() {
 
   const roundToken = useRef(0);
 
-  const swapDurationMs = Math.max(140, Math.round(650 * Math.pow(0.88, level - 1)));
-  const swapCount = 5 + level * 2;
+  // Lv.6까지는 매 레벨 12%씩 빨라지고, Lv.7부터는 6%씩만 (7부터 극단적이라는 피드백 반영)
+  const swapDurationMs = level <= 6
+    ? Math.round(650 * Math.pow(0.88, level - 1))
+    : Math.round(650 * Math.pow(0.88, 5) * Math.pow(0.94, level - 6));
+  // 섞는 횟수도 Lv.7부터는 +2가 아니라 +1씩만 증가
+  const swapCount = level <= 6 ? 5 + level * 2 : 17 + (level - 6);
   // 카드가 자리를 옮기는 슬라이드 자체는 스왑 간격의 78% 정도로, 스냅되지 않고 부드럽게 흐르듯 이동
   const cardTransitionMs = Math.max(90, Math.round(swapDurationMs * 0.78));
 
@@ -626,7 +630,7 @@ function App() {
           </div>
 
           <div className="footnote">
-            섞는 속도: {swapDurationMs}ms/회 · {swapCount}회 섞음 (레벨이 오를수록 기하급수적으로 빨라짐)
+            섞는 속도: {swapDurationMs}ms/회 · {swapCount}회 섞음 (레벨이 오를수록 빨라짐)
           </div>
         </React.Fragment>
       )}
