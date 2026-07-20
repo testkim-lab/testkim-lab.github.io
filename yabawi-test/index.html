@@ -3,8 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="robots" content="noindex, nofollow" />
-<title>야바위 아저씨 (테스트 빌드)</title>
+<meta name="theme-color" content="#160b24" />
+<link rel="canonical" href="https://testkim-lab.github.io/yabawi-test/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23160b24' width='200' height='200'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='120' font-family='system-ui'>🃏</text></svg>">
+<title>야바위 아저씨 🃏 | 클로버를 찾아라! 레트로 야바위 카드게임</title>
+<meta name="description" content="점점 빨라지는 셔플 속에서 클로버 카드를 끝까지 쫓아라! 스테이지 10을 깨면 전설의 타짜. 설치 없이 바로 하는 무료 미니게임.">
+<meta name="keywords" content="야바위 게임, 카드 게임, 미니게임, 무료 게임, 순발력 게임, 셔플 게임">
+<meta property="og:type" content="website">
+<meta property="og:title" content="야바위 아저씨 🃏 클로버를 찾아라!">
+<meta property="og:description" content="점점 빨라지는 셔플 속에서 클로버를 쫓아라! 스테이지 10을 깨면 전설의 타짜.">
+<meta property="og:url" content="https://testkim-lab.github.io/yabawi-test/">
+<meta name="twitter:card" content="summary_large_image">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8471384112148064"
+     crossorigin="anonymous"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Jua&display=swap" rel="stylesheet">
 <style>
@@ -638,13 +649,6 @@ function App() {
     startRound(1);
   };
 
-  // 테스트 전용: 10판을 직접 안 깨도 엔딩 화면을 바로 확인할 수 있게 레벨 10에서 시작
-  const handleStartAtLevel10 = () => {
-    setLevel(10);
-    setHearts(3);
-    startRound(10);
-  };
-
   const handleRetry = () => {
     setHearts(3);
     setLevel(1);
@@ -761,7 +765,7 @@ function App() {
   return (
     <div className="cabinet">
       <div className="title">🃏 야바위 아저씨 🃏</div>
-      <div className="subtitle">TEST BUILD · LEVEL 1 미리보기</div>
+      <div className="subtitle">손은 눈보다 빠르다 · 클로버를 찾아라</div>
 
       {phase === "win" ? (
         <div className="win-screen">
@@ -842,10 +846,7 @@ function App() {
 
       <div className="controls">
         {phase === "idle" && (
-          <React.Fragment>
-            <button className="btn" onClick={handleStart}>게임 시작</button>
-            <button className="btn ghost" onClick={handleStartAtLevel10}>🧪 LV.10부터 (테스트)</button>
-          </React.Fragment>
+          <button className="btn" onClick={handleStart}>게임 시작</button>
         )}
         {(phase === "gameover" || phase === "win") && (
           <React.Fragment>
