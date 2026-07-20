@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>야바위 아저씨 (테스트 빌드)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --neon-pink:#ff2fd0;
+    --neon-cyan:#00fff2;
+    --neon-yellow:#fbff00;
+    --bg-deep:#07050d;
+    --bg-panel:#120c1f;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at 50% -10%, #2a0f3d 0%, var(--bg-deep) 55%),
+      var(--bg-deep);
+    font-family:'Jua','Press Start 2P',sans-serif;
+    color:#f4f0ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow-x:hidden;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  #root{width:100%;max-width:460px;padding:16px;}
+
+  .scanlines{
+    pointer-events:none;
+    position:fixed;inset:0;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.035) 0px,
+      rgba(255,255,255,0.035) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+    mix-blend-mode:overlay;
+    z-index:50;
+  }
+  .vignette{
+    pointer-events:none;
+    position:fixed;inset:0;
+    box-shadow: inset 0 0 18vw 2vw rgba(0,0,0,0.85);
+    z-index:51;
+  }
+
+  .cabinet{
+    position:relative;
+    background:linear-gradient(180deg,#1a1028 0%, var(--bg-panel) 100%);
+    border:3px solid #3a2a55;
+    border-radius:18px;
+    padding:18px 16px 22px;
+    box-shadow:
+      0 0 0 2px #000 inset,
+      0 0 30px rgba(255,47,208,0.15),
+      0 20px 40px rgba(0,0,0,0.6);
+  }
+
+  .title{
+    text-align:center;
+    font-family:'Press Start 2P',monospace;
+    font-size:13px;
+    letter-spacing:1px;
+    color:var(--neon-yellow);
+    text-shadow:0 0 6px var(--neon-yellow), 0 0 16px rgba(251,255,0,0.6);
+    margin:2px 0 14px;
+    line-height:1.6;
+  }
+  .subtitle{
+    text-align:center;
+    font-family:'Press Start 2P',monospace;
+    font-size:8px;
+    color:#8b7fb0;
+    margin-top:-8px;
+    margin-bottom:14px;
+  }
+
+  .hud{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    font-family:'Press Start 2P',monospace;
+    font-size:10px;
+  }
+  .stage-badge{
+    background:#000;
+    border:2px solid var(--neon-cyan);
+    color:var(--neon-cyan);
+    padding:6px 10px;
+    border-radius:6px;
+    text-shadow:0 0 6px var(--neon-cyan);
+    box-shadow:0 0 10px rgba(0,255,242,0.35);
+  }
+  .hearts{
+    display:flex;
+    gap:4px;
+    font-size:20px;
+  }
+  .heart{
+    filter:drop-shadow(0 0 4px var(--neon-pink));
+    transition:transform 0.25s;
+  }
+  .heart.lost{
+    filter:grayscale(1) opacity(0.35);
+    transform:scale(0.85) rotate(-8deg);
+  }
+
+  .stage-scene{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .ahjussi{
+    font-size:64px;
+    line-height:1;
+    filter:drop-shadow(0 0 14px rgba(255,47,208,0.45));
+    animation:bob 2.4s ease-in-out infinite;
+  }
+  .ahjussi.taunt{ animation:shake 0.5s ease-in-out; }
+  @keyframes bob{
+    0%,100%{ transform:translateY(0) rotate(-2deg); }
+    50%{ transform:translateY(-6px) rotate(2deg); }
+  }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    20%{ transform:translateX(-6px) rotate(-4deg); }
+    40%{ transform:translateX(6px) rotate(4deg); }
+    60%{ transform:translateX(-4px) rotate(-3deg); }
+    80%{ transform:translateX(4px) rotate(3deg); }
+  }
+
+  .speech-bubble{
+    position:relative;
+    max-width:280px;
+    min-height:20px;
+    background:#fff;
+    color:#1a1028;
+    font-family:'Jua',sans-serif;
+    font-size:14px;
+    text-align:center;
+    padding:10px 14px;
+    border-radius:14px;
+    margin-top:6px;
+    box-shadow:0 4px 0 rgba(0,0,0,0.35);
+    animation:pop-in 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .speech-bubble::after{
+    content:"";
+    position:absolute;
+    top:-8px;
+    left:50%;
+    transform:translateX(-50%);
+    border-width:0 8px 10px 8px;
+    border-style:solid;
+    border-color:transparent transparent #fff transparent;
+  }
+  @keyframes pop-in{
+    0%{ transform:scale(0.6); opacity:0; }
+    100%{ transform:scale(1); opacity:1; }
+  }
+
+  .board{
+    position:relative;
+    height:120px;
+    margin:18px auto 8px;
+    width:308px;
+  }
+  .card{
+    position:absolute;
+    top:0;
+    width:68px;
+    height:96px;
+    border-radius:10px;
+    cursor:pointer;
+    transform-style:preserve-3d;
+    transition-property:transform, filter;
+    transition-timing-function:ease-in-out;
+  }
+  .card.locked{ cursor:default; }
+  .card:active:not(.locked){ transform-origin:center; }
+  .card-inner{
+    position:relative;
+    width:100%;
+    height:100%;
+    transform-style:preserve-3d;
+    transition:transform 0.42s cubic-bezier(0.4,0.1,0.2,1);
+  }
+  .card-inner.face-up{ transform:rotateY(180deg); }
+  .card-face{
+    position:absolute;
+    inset:0;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    backface-visibility:hidden;
+    box-shadow:0 6px 12px rgba(0,0,0,0.5);
+  }
+  .card-back{
+    background:
+      repeating-linear-gradient(45deg, #241537, #241537 6px, #2e1a45 6px, #2e1a45 12px);
+    border:2px solid var(--neon-cyan);
+    box-shadow:0 0 10px rgba(0,255,242,0.35), 0 6px 12px rgba(0,0,0,0.5);
+  }
+  .card-back::before{
+    content:"?";
+    font-family:'Press Start 2P',monospace;
+    font-size:20px;
+    color:var(--neon-cyan);
+    text-shadow:0 0 6px var(--neon-cyan);
+  }
+  .card-front{
+    background:#faf6ee;
+    color:#2a1a10;
+    transform:rotateY(180deg);
+    border:2px solid #d8c9a8;
+  }
+  .card-front.is-winner{
+    border:2px solid var(--neon-yellow);
+    box-shadow:0 0 16px var(--neon-yellow), 0 0 30px rgba(251,255,0,0.5);
+    animation:sparkle 0.9s ease-in-out infinite;
+  }
+  @keyframes sparkle{
+    0%,100%{ box-shadow:0 0 10px var(--neon-yellow), 0 0 20px rgba(251,255,0,0.4); }
+    50%{ box-shadow:0 0 20px var(--neon-yellow), 0 0 40px rgba(251,255,0,0.75); }
+  }
+  .card-front.picked-correct{
+    border-color:#39ff88;
+    box-shadow:0 0 16px #39ff88, 0 0 28px rgba(57,255,136,0.55);
+  }
+  .card-front.picked-wrong{
+    border-color:#ff3b3b;
+    box-shadow:0 0 16px #ff3b3b, 0 0 28px rgba(255,59,59,0.55);
+  }
+
+  .win-screen{
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:300px;
+    padding:18px 0 6px;
+  }
+  .confetti-wrap{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+  }
+  .confetti{
+    position:absolute;
+    top:-24px;
+    font-size:20px;
+    animation:confettiFall 3.2s linear infinite;
+  }
+  @keyframes confettiFall{
+    0%{ transform:translateY(-24px) rotate(0deg); opacity:1; }
+    100%{ transform:translateY(360px) rotate(360deg); opacity:0.15; }
+  }
+  .win-trophy{
+    font-size:60px;
+    filter:drop-shadow(0 0 18px var(--neon-yellow));
+    animation:winBounce 1.2s ease-in-out infinite;
+  }
+  @keyframes winBounce{
+    0%,100%{ transform:translateY(0) rotate(-4deg); }
+    50%{ transform:translateY(-10px) rotate(4deg); }
+  }
+  .win-title{
+    font-family:'Press Start 2P',monospace;
+    font-size:26px;
+    letter-spacing:1.5px;
+    color:var(--neon-yellow);
+    text-shadow:0 0 10px var(--neon-yellow), 0 0 26px rgba(251,255,0,0.7);
+    margin-top:14px;
+    animation:winGlow 1.6s ease-in-out infinite;
+    text-align:center;
+  }
+  .win-sub{
+    font-family:'Press Start 2P',monospace;
+    font-size:15px;
+    color:var(--neon-cyan);
+    text-shadow:0 0 8px var(--neon-cyan);
+    margin-top:12px;
+    text-align:center;
+  }
+  @keyframes winGlow{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.72; }
+  }
+  .win-screen .stage-scene{
+    margin-top:26px;
+  }
+
+  .coupang-slot{
+    width:100%;
+    max-width:308px;
+    min-height:64px;
+    margin:18px auto 0;
+    border:1px dashed #5c4f7a;
+    border-radius:8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    padding:10px;
+    font-family:'Jua',sans-serif;
+    font-size:11px;
+    color:#8b7fb0;
+    background:rgba(255,255,255,0.02);
+  }
+  .coupang-slot .coupang-disclaimer{
+    font-size:9px;
+    color:#5c4f7a;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:16px;
+  }
+  .btn{
+    font-family:'Press Start 2P',monospace;
+    font-size:11px;
+    color:#0a0a0a;
+    background:linear-gradient(180deg,var(--neon-yellow),#e6c400);
+    border:none;
+    padding:14px 26px;
+    border-radius:8px;
+    cursor:pointer;
+    box-shadow:0 4px 0 #8f7900, 0 0 18px rgba(251,255,0,0.4);
+    transition:transform 0.08s;
+  }
+  .btn:active{ transform:translateY(3px); box-shadow:0 1px 0 #8f7900; }
+  .btn.ghost{
+    background:transparent;
+    color:var(--neon-cyan);
+    border:2px solid var(--neon-cyan);
+    box-shadow:0 0 14px rgba(0,255,242,0.35);
+  }
+
+  .footnote{
+    text-align:center;
+    font-size:10px;
+    color:#5c4f7a;
+    margin-top:16px;
+    font-family:'Jua',sans-serif;
+  }
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
+
+<script id="app-source" type="text/plain">
+const { useState, useRef, useEffect, useCallback } = React;
+
+const LINES = {
+  intro: ["어서와, 눈썰미 좀 있나?", "기회는 딱 3번이야"],
+  reveal: ["네 운명을 결정할 패니깐 잘 봐둬", "딱 한 번만 보여준다", "흘러간 패는 다시 돌아오지 않아"],
+  shuffle: ["쿵짝짝 쿵짝짝", "여기서부터 기술 들어가는 거야", "손은 눈보다 빠르니깐"],
+  guess: ["이길 수 있겠냐 고니야, 담배 하나 찔러봐"],
+  correct: ["좋은 눈을 가졌어", "기술 쓴 거야?", "이거 아주 타짜구만"],
+  wrong: ["눈이 좀 침침해?", "틀렸쥬?", "싸늘하지?"],
+  gameover: ["이 바닥엔 영원한 고수가 없다고 했던가", "여기서 그만두면 타짜가 아니지"],
+  win: ["애초에 속을 수가 없었군", "내가 본 타짜 중에 최고구만"],
+};
+const CONFETTI = ["🎉", "✨", "🃏", "🏆", "⭐", "🎉", "✨", "🃏", "🏆", "⭐", "🎉", "✨"];
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+const CARD_W = 68;
+const CARD_GAP = 12;
+const BOARD_W = 308;
+
+// 레벨 6부터 카드 한 장 늘어나서 확률·셔플 둘 다 빡세짐 (Lv.1~5=3장, Lv.6~10=4장)
+function cardCountForLevel(level) {
+  return level >= 6 ? 4 : 3;
+}
+
+function getSlotX(count) {
+  const totalW = count * CARD_W + (count - 1) * CARD_GAP;
+  const offset = (BOARD_W - totalW) / 2;
+  return Array.from({ length: count }, (_, i) => offset + i * (CARD_W + CARD_GAP));
+}
+
+function makeRound(count) {
+  const winnerId = Math.floor(Math.random() * count);
+  return Array.from({ length: count }, (_, id) => ({ id, slot: id, isWinner: id === winnerId }));
+}
+
+// 웹오디오로 합성한 레트로 삑삑이 효과음 (외부 파일 다운로드 없이 즉시 재생)
+let audioCtx = null;
+function beep(freq, duration, type = "square", startGain = 0.06) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(startGain, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch (e) { /* 오디오 컨텍스트 미지원 브라우저는 조용히 무시 */ }
+}
+const sfx = {
+  tick: () => beep(320, 0.05, "square", 0.04),
+  correct: () => { beep(660, 0.1); setTimeout(() => beep(880, 0.14), 90); setTimeout(() => beep(1180, 0.18), 180); },
+  wrong: () => { beep(180, 0.22, "sawtooth", 0.08); setTimeout(() => beep(120, 0.28, "sawtooth", 0.07), 120); },
+  levelup: () => { beep(520, 0.09); setTimeout(() => beep(780, 0.09), 90); setTimeout(() => beep(1040, 0.16), 180); },
+};
+
+function App() {
+  const [level, setLevel] = useState(1);
+  const [hearts, setHearts] = useState(3);
+  const [phase, setPhase] = useState("idle"); // idle | reveal | hide | shuffle | guess | result | gameover | win
+  const [cards, setCards] = useState(makeRound(cardCountForLevel(1)));
+  const [message, setMessage] = useState(pick(LINES.intro));
+  const [pickedId, setPickedId] = useState(null);
+  const [taunting, setTaunting] = useState(false);
+
+  const roundToken = useRef(0);
+
+  const swapDurationMs = Math.max(140, Math.round(650 * Math.pow(0.88, level - 1)));
+  const swapCount = 5 + level * 2;
+  // 카드가 자리를 옮기는 슬라이드 자체는 스왑 간격의 78% 정도로, 스냅되지 않고 부드럽게 흐르듯 이동
+  const cardTransitionMs = Math.max(90, Math.round(swapDurationMs * 0.78));
+
+  const shuffle = useCallback(async (myToken, startCards) => {
+    let arr = startCards.map((c) => ({ ...c }));
+    const count = arr.length;
+    for (let i = 0; i < swapCount; i++) {
+      if (roundToken.current !== myToken) return arr;
+      let a = Math.floor(Math.random() * count);
+      let b = Math.floor(Math.random() * count);
+      while (b === a) b = Math.floor(Math.random() * count);
+      const ca = arr.find((c) => c.slot === a);
+      const cb = arr.find((c) => c.slot === b);
+      ca.slot = b;
+      cb.slot = a;
+      arr = arr.map((c) => ({ ...c }));
+      sfx.tick();
+      setCards(arr);
+      await delay(swapDurationMs);
+    }
+    return arr;
+  }, [swapCount, swapDurationMs]);
+
+  const startRound = useCallback(async (targetLevel) => {
+    const myToken = ++roundToken.current;
+    const round = makeRound(cardCountForLevel(targetLevel));
+    setPickedId(null);
+    setCards(round);
+    setPhase("reveal");
+    setMessage(pick(LINES.reveal));
+
+    await delay(1300);
+    if (roundToken.current !== myToken) return;
+
+    setPhase("hide");
+    await delay(450);
+    if (roundToken.current !== myToken) return;
+
+    setPhase("shuffle");
+    setMessage(pick(LINES.shuffle));
+    const shuffled = await shuffle(myToken, round);
+    if (roundToken.current !== myToken) return;
+
+    setCards(shuffled);
+    setPhase("guess");
+    setMessage(pick(LINES.guess));
+  }, [shuffle]);
+
+  const handleStart = () => {
+    setLevel(1);
+    setHearts(3);
+    startRound(1);
+  };
+
+  // 테스트 전용: 10판을 직접 안 깨도 엔딩 화면을 바로 확인할 수 있게 레벨 10에서 시작
+  const handleStartAtLevel10 = () => {
+    setLevel(10);
+    setHearts(3);
+    startRound(10);
+  };
+
+  const handleRetry = () => {
+    setHearts(3);
+    setLevel(1);
+    startRound(1);
+  };
+
+  const handlePick = (cardId) => {
+    if (phase !== "guess") return;
+    const myToken = roundToken.current;
+    const card = cards.find((c) => c.id === cardId);
+    setPickedId(cardId);
+    setPhase("result");
+
+    if (card.isWinner) {
+      sfx.correct();
+      setMessage(pick(LINES.correct));
+      setTaunting(false);
+      (async () => {
+        await delay(1400);
+        if (roundToken.current !== myToken) return;
+        if (level >= 10) {
+          setMessage(pick(LINES.win));
+          setPhase("win");
+        } else {
+          sfx.levelup();
+          const next = level + 1;
+          setLevel(next);
+          startRound(next);
+        }
+      })();
+    } else {
+      sfx.wrong();
+      setMessage(pick(LINES.wrong));
+      setTaunting(true);
+      setTimeout(() => setTaunting(false), 500);
+      const remaining = hearts - 1;
+      setHearts(remaining);
+      (async () => {
+        await delay(1400);
+        if (roundToken.current !== myToken) return;
+        if (remaining <= 0) {
+          setMessage(pick(LINES.gameover));
+          setPhase("gameover");
+        } else {
+          startRound(level);
+        }
+      })();
+    }
+  };
+
+  const showFaces = phase === "reveal" || phase === "result";
+  const locked = phase !== "guess";
+
+  return (
+    <div className="cabinet">
+      <div className="title">🃏 야바위 아저씨 🃏</div>
+      <div className="subtitle">TEST BUILD · LEVEL 1 미리보기</div>
+
+      {phase === "win" ? (
+        <div className="win-screen">
+          <div className="confetti-wrap">
+            {CONFETTI.map((e, i) => (
+              <span key={i} className="confetti" style={{ left: `${6 + i * 7}%`, animationDelay: `${(i % 5) * 0.3}s` }}>{e}</span>
+            ))}
+          </div>
+          <div className="win-trophy">🏆</div>
+          <div className="win-title">전설의 타짜</div>
+          <div className="win-sub">STAGE 10 올클리어!</div>
+          <div className="stage-scene">
+            <div className="ahjussi">🧔🏻</div>
+            <div className="speech-bubble" key={message}>{message}</div>
+          </div>
+          {/* 쿠팡 파트너스 배너 자리 — 실제 위젯 iframe/링크 정해지면 여기 내용물만 교체 */}
+          <div className="coupang-slot">
+            <span>🛒 쿠팡 파트너스 배너 자리 (연동 예정)</span>
+            <span className="coupang-disclaimer">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span>
+          </div>
+        </div>
+      ) : (
+        <React.Fragment>
+          <div className="hud">
+            <div className="stage-badge">STAGE {String(level).padStart(2, "0")}</div>
+            <div className="hearts">
+              {[0, 1, 2].map((i) => (
+                <span key={i} className={"heart" + (i >= hearts ? " lost" : "")}>
+                  {i >= hearts ? "💔" : "💗"}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="stage-scene">
+            <div className={"ahjussi" + (taunting ? " taunt" : "")}>🧔🏻</div>
+            <div className="speech-bubble" key={message}>{message}</div>
+          </div>
+
+          <div className="board">
+            {(() => { const slotX = getSlotX(cards.length); return cards.map((c) => {
+              let frontClass = "card-face card-front";
+              if (c.isWinner) frontClass += " is-winner";
+              if (pickedId === c.id && phase === "result") {
+                frontClass += c.isWinner ? " picked-correct" : " picked-wrong";
+              }
+              return (
+                <div
+                  key={c.id}
+                  className={"card" + (locked ? " locked" : "")}
+                  style={{ transform: `translateX(${slotX[c.slot]}px)`, transitionDuration: `${cardTransitionMs}ms` }}
+                  onClick={() => handlePick(c.id)}
+                >
+                  <div className={"card-inner" + (showFaces ? " face-up" : "")}>
+                    <div className="card-face card-back"></div>
+                    <div className={frontClass}>{c.isWinner ? "🍀" : "❌"}</div>
+                  </div>
+                </div>
+              );
+            }); })()}
+          </div>
+
+          <div className="footnote">
+            섞는 속도: {swapDurationMs}ms/회 · {swapCount}회 섞음 (레벨이 오를수록 기하급수적으로 빨라짐)
+          </div>
+        </React.Fragment>
+      )}
+
+      <div className="controls">
+        {phase === "idle" && (
+          <React.Fragment>
+            <button className="btn" onClick={handleStart}>게임 시작</button>
+            <button className="btn ghost" onClick={handleStartAtLevel10}>🧪 LV.10부터 (테스트)</button>
+          </React.Fragment>
+        )}
+        {(phase === "gameover" || phase === "win") && (
+          <button className="btn ghost" onClick={handleRetry}>다시 도전</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+<script>
+  // JSX 소스를 classic 런타임으로 명시 변환 후 실행 (automatic 런타임은 import문을 주입해 일반 <script>에서 깨짐)
+  var __src = document.getElementById("app-source").textContent;
+  var __out = Babel.transform(__src, { presets: [["react", { runtime: "classic" }]] }).code;
+  var __el = document.createElement("script");
+  __el.textContent = __out;
+  document.body.appendChild(__el);
+</script>
+</body>
+</html>
