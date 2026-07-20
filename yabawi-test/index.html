@@ -856,6 +856,10 @@ function App() {
         )}
       </div>
 
+      <div className="controls" style={{ marginTop: 10 }}>
+        <a className="btn ghost" href="../" style={{ textAlign: "center", textDecoration: "none" }}>🍞 다른 테스트 하러 가기</a>
+      </div>
+
       {shareOpen && (
         <div className="modal-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setShareOpen(false); }}>
           <div className="modal-box">
